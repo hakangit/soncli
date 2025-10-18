@@ -3,47 +3,35 @@
 [![Go](https://img.shields.io/badge/Go-1.21+-blue.svg)](https://golang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A powerful command-line interface for managing Sonarr (TV shows) and Sabnzbd (downloads) with beautiful formatting, ASCII art, and shell completions.
+A command-line interface for managing Sonarr (TV shows) and Sabnzbd (downloads).
 
-![Demo](https://via.placeholder.com/800x400/333/fff?text=CLI+Demo+Screenshot)
+## Features
 
-## ✨ Features
+- Sonarr integration: Search, add, and manage TV series
+- Sabnzbd integration: Monitor downloads with progress bars
+- ASCII art: Display 8x8 colored ASCII art posters for TV shows
+- Shell completions: Support for Bash, Zsh, Fish, and PowerShell
+- JSON output: Structured output for scripting and automation
+- Interactive setup: Configuration wizard for first-time setup
 
-- **🎬 Sonarr Integration**: Search, add, and manage TV series with ASCII art posters
-- **📥 Sabnzbd Integration**: Monitor downloads with progress bars and rich formatting
-- **🎨 ASCII Art**: Scalarr-style 8x8 colored ASCII art posters for TV shows
-- **🔧 Shell Completions**: Bash, Zsh, Fish, and PowerShell support
-- **📊 JSON Output**: Perfect for scripting and automation
-- **🚀 Rich UI**: Emojis, progress bars, and beautiful formatting
-- **⚙️ Interactive Setup**: Easy configuration wizard for first-time setup
+## Installation
 
-## ✨ Features
+### Quick Setup
 
-- **🎬 Sonarr Integration**: Search, add, and manage TV series
-- **📥 Sabnzbd Integration**: Monitor downloads with progress bars and rich formatting
-- **🎨 ASCII Art**: Scalarr-style 8x8 colored ASCII art posters
-- **🔧 Shell Completions**: Bash, Zsh, Fish, and PowerShell support
-- **📊 JSON Output**: Perfect for scripting and automation
-- **🚀 Rich UI**: Emojis, progress bars, and beautiful formatting
-
-## 🚀 Installation
-
-### Quick Setup (Recommended)
-
-1. **Clone and build:**
+1. Clone and build:
 ```bash
-git clone <repository-url>
+git clone https://github.com/hakangit/soncli.git
 cd soncli
 go build -o soncli main.go
 sudo mv soncli /usr/local/bin/
 ```
 
-2. **Run interactive setup:**
+2. Run setup:
 ```bash
 soncli setup
 ```
 
-The setup wizard will guide you through configuring your Sonarr and Sabnzbd connections!
+The setup wizard will guide you through configuring your connections.
 
 ### Manual Installation
 
@@ -53,13 +41,8 @@ If you prefer manual configuration, build from source and create the config file
 
 #### Zsh
 ```bash
-# Generate completion script
 soncli completion zsh > ~/.zsh/_soncli
-
-# Add to ~/.zshrc if not present
 echo "autoload -Uz compinit && compinit" >> ~/.zshrc
-
-# Reload
 source ~/.zshrc
 ```
 
@@ -68,7 +51,7 @@ source ~/.zshrc
 soncli completion bash > /etc/bash_completion.d/soncli
 ```
 
-## 📖 Usage
+## Usage
 
 ### Sonarr Commands
 
@@ -120,16 +103,16 @@ soncli status
 soncli completion [bash|zsh|fish|powershell]
 ```
 
-## ⚙️ Configuration
+## Configuration
 
-### Easy Setup (Recommended)
+### Setup
 
-Run the interactive setup wizard:
+Run the setup wizard:
 ```bash
 soncli setup
 ```
 
-This will guide you through configuring both Sonarr and Sabnzbd connections and test them automatically.
+This will guide you through configuring your connections.
 
 ### Manual Configuration
 
@@ -156,25 +139,25 @@ ui:
   max_results: 10            # Maximum search results to show
 ```
 
-## 🎨 ASCII Art
+## ASCII Art
 
-Display beautiful 8x8 colored ASCII art posters just like Scalarr:
+Display 8x8 colored ASCII art posters:
 
 ```bash
 sonarr search "Breaking Bad" --ascii
 sonarr series --ascii
 ```
 
-## 📊 JSON Output
+## JSON Output
 
-All commands support JSON output for scripting:
+Commands support JSON output for scripting:
 
 ```bash
 sonarr series --json | jq '.[] | select(.monitored) | .title'
 sabnzbd queue --json | jq '.slots[0].percentage'
 ```
 
-## 🛠️ Development
+## Development
 
 ```bash
 # Install dependencies
@@ -190,11 +173,11 @@ go build -o soncli main.go
 go vet ./...
 ```
 
-## 📝 License
+## License
 
 MIT License - see LICENSE file for details.
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -202,10 +185,9 @@ MIT License - see LICENSE file for details.
 4. Add tests if applicable
 5. Submit a pull request
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Cobra](https://github.com/spf13/cobra) - CLI framework
 - [Scalarr](https://github.com/zemmyang/scalarr) - Inspiration for ASCII art
 - [Sonarr](https://sonarr.tv/) - TV show management
-- [Sabnzbd](https://sabnzbd.org/) - Binary newsreader</content>
-</xai:function_call">README.md# soncli
+- [Sabnzbd](https://sabnzbd.org/) - Binary newsreader
