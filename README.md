@@ -1,6 +1,21 @@
 # Sonarr-Sabnzbd CLI
 
+[![Go](https://img.shields.io/badge/Go-1.21+-blue.svg)](https://golang.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A powerful command-line interface for managing Sonarr (TV shows) and Sabnzbd (downloads) with beautiful formatting, ASCII art, and shell completions.
+
+![Demo](https://via.placeholder.com/800x400/333/fff?text=CLI+Demo+Screenshot)
+
+## ✨ Features
+
+- **🎬 Sonarr Integration**: Search, add, and manage TV series with ASCII art posters
+- **📥 Sabnzbd Integration**: Monitor downloads with progress bars and rich formatting
+- **🎨 ASCII Art**: Scalarr-style 8x8 colored ASCII art posters for TV shows
+- **🔧 Shell Completions**: Bash, Zsh, Fish, and PowerShell support
+- **📊 JSON Output**: Perfect for scripting and automation
+- **🚀 Rich UI**: Emojis, progress bars, and beautiful formatting
+- **⚙️ Interactive Setup**: Easy configuration wizard for first-time setup
 
 ## ✨ Features
 
@@ -13,13 +28,26 @@ A powerful command-line interface for managing Sonarr (TV shows) and Sabnzbd (do
 
 ## 🚀 Installation
 
-### Build from source
+### Quick Setup (Recommended)
+
+1. **Clone and build:**
 ```bash
 git clone <repository-url>
-cd sonarr-cli
+cd sonarr-sabnzbd-cli
 go build -o sonarr-sabnzbd-cli main.go
 sudo mv sonarr-sabnzbd-cli /usr/local/bin/
 ```
+
+2. **Run interactive setup:**
+```bash
+sonarr-sabnzbd-cli setup
+```
+
+The setup wizard will guide you through configuring your Sonarr and Sabnzbd connections!
+
+### Manual Installation
+
+If you prefer manual configuration, build from source and create the config file manually.
 
 ### Shell Completions
 
@@ -82,6 +110,9 @@ sabnzbd speed 50
 ### General
 
 ```bash
+# Interactive setup wizard (first-time setup)
+sonarr-sabnzbd-cli setup
+
 # Check service status
 sonarr-sabnzbd-cli status
 
@@ -91,22 +122,38 @@ sonarr-sabnzbd-cli completion [bash|zsh|fish|powershell]
 
 ## ⚙️ Configuration
 
-Create a config file at `~/.config/sonarr-sabnzbd-cli/config.yaml`:
+### Easy Setup (Recommended)
+
+Run the interactive setup wizard:
+```bash
+sonarr-sabnzbd-cli setup
+```
+
+This will guide you through configuring both Sonarr and Sabnzbd connections and test them automatically.
+
+### Manual Configuration
+
+If you prefer manual setup, create a config file at `~/.config/sonarr-sabnzbd-cli/config.yaml`:
 
 ```yaml
 sonarr:
-  host: "localhost"
-  port: 8989
-  apikey: "your-sonarr-api-key"
+  host: "localhost"          # Your Sonarr server IP/hostname
+  port: 8989                 # Default Sonarr port
+  apikey: "your-api-key-here"  # Get from Sonarr Settings > General > API Key
   timeout: 30
 
 sabnzbd:
-  host: "localhost"
-  port: 8080
-  apikey: "your-sabnzbd-api-key"
-  username: ""  # optional
-  password: ""  # optional
+  host: "localhost"          # Your Sabnzbd server IP/hostname
+  port: 8080                 # Default Sabnzbd port
+  apikey: "your-api-key-here"  # Get from Sabnzbd Config > General > API Key
+  username: ""               # Optional: only if authentication is enabled
+  password: ""               # Optional: only if authentication is enabled
   timeout: 30
+
+# UI preferences
+ui:
+  colors: true               # Enable colored output
+  max_results: 10            # Maximum search results to show
 ```
 
 ## 🎨 ASCII Art

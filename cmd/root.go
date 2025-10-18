@@ -1,7 +1,12 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"sonarr-sabnzbd-cli/internal/api/sabnzbd"
@@ -69,6 +74,143 @@ func GetSabnzbdClient() *sabnzbd.Client {
 }
 
 // RootCmd returns the root command
+// runSetupWizard runs an interactive setup wizard
+func runSetupWizard() error {
+	fmt.Println("🚀 Sonarr-Sabnzbd CLI Setup Wizard")
+	fmt.Println("===================================")
+	fmt.Println()
+
+	reader := bufio.NewReader(os.Stdin)
+
+	// Sonarr setup
+	fmt.Println("📺 Sonarr Configuration")
+	fmt.Println("----------------------")
+
+	sonarrHost := promptWithDefault(reader, "Sonarr Host", "localhost")
+	sonarrPortStr := promptWithDefault(reader, "Sonarr Port", "8989")
+	sonarrAPIKey := promptRequired(reader, "Sonarr API Key (get from Settings > General > API Key)")
+
+	sonarrPort, err := strconv.Atoi(sonarrPortStr)
+	if err != nil {
+		return fmt.Errorf("invalid port number: %w", err)
+	}
+
+	// Sabnzbd setup
+	fmt.Println()
+	fmt.Println("📥 Sabnzbd Configuration")
+	fmt.Println("-----------------------")
+
+	sabnzbdHost := promptWithDefault(reader, "Sabnzbd Host", "localhost")
+	sabnzbdPortStr := promptWithDefault(reader, "Sabnzbd Port", "8080")
+	sabnzbdAPIKey := promptRequired(reader, "Sabnzbd API Key (get from Config > General > API Key)")
+
+	sabnzbdPort, err := strconv.Atoi(sabnzbdPortStr)
+	if err != nil {
+		return fmt.Errorf("invalid port number: %w", err)
+	}
+
+	// Optional authentication for Sabnzbd
+	sabnzbdUsername := promptOptional(reader, "Sabnzbd Username (leave empty if no auth)")
+	sabnzbdPassword := ""
+	if sabnzbdUsername != "" {
+		sabnzbdPassword = promptOptional(reader, "Sabnzbd Password")
+	}
+
+	// Create config
+	cfg := &models.Config{
+		Sonarr: models.SonarrConfig{
+			Host:    sonarrHost,
+			Port:    sonarrPort,
+			APIKey:  sonarrAPIKey,
+			Timeout: 30 * time.Second,
+		},
+		Sabnzbd: models.SabnzbdConfig{
+			Host:     sabnzbdHost,
+			Port:     sabnzbdPort,
+			APIKey:   sabnzbdAPIKey,
+			Username: sabnzbdUsername,
+			Password: sabnzbdPassword,
+			Timeout:  30 * time.Second,
+		},
+		UI: models.UIConfig{
+			Colors:     true,
+			MaxResults: 10,
+		},
+	}
+
+	// Test connections
+	fmt.Println()
+	fmt.Println("🔍 Testing Connections...")
+	fmt.Println("------------------------")
+
+	// Test Sonarr
+	fmt.Print("📺 Testing Sonarr connection... ")
+	sonarrClient := sonarr.NewClient(sonarrHost, sonarrPort, sonarrAPIKey, 30*time.Second)
+	if _, err := sonarrClient.GetSystemStatus(); err != nil {
+		fmt.Printf("❌ Failed: %v\n", err)
+		fmt.Println("⚠️  Configuration saved but Sonarr connection failed. Check your settings.")
+	} else {
+		fmt.Println("✅ Success!")
+	}
+
+	// Test Sabnzbd
+	fmt.Print("📥 Testing Sabnzbd connection... ")
+	sabnzbdClient := sabnzbd.NewClient(sabnzbdHost, sabnzbdPort, sabnzbdAPIKey, sabnzbdUsername, sabnzbdPassword, 30*time.Second)
+	if _, err := sabnzbdClient.GetVersion(); err != nil {
+		fmt.Printf("❌ Failed: %v\n", err)
+		fmt.Println("⚠️  Configuration saved but Sabnzbd connection failed. Check your settings.")
+	} else {
+		fmt.Println("✅ Success!")
+	}
+
+	// Save config
+	fmt.Println()
+	fmt.Print("💾 Saving configuration... ")
+	if err := config.SaveConfig(cfg); err != nil {
+		return fmt.Errorf("failed to save config: %w", err)
+	}
+	fmt.Println("✅ Saved!")
+
+	fmt.Println()
+	fmt.Println("🎉 Setup complete! You can now use the CLI:")
+	fmt.Println("   sonarr-sabnzbd-cli status    # Check service status")
+	fmt.Println("   sonarr search \"Breaking Bad\" --add 1    # Search and add shows")
+	fmt.Println("   sabnzbd queue               # View download queue")
+
+	return nil
+}
+
+// promptWithDefault prompts user with a default value
+func promptWithDefault(reader *bufio.Reader, prompt, defaultValue string) string {
+	fmt.Printf("%s [%s]: ", prompt, defaultValue)
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(input)
+	if input == "" {
+		return defaultValue
+	}
+	return input
+}
+
+// promptRequired prompts user for required input
+func promptRequired(reader *bufio.Reader, prompt string) string {
+	for {
+		fmt.Printf("%s: ", prompt)
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+		if input != "" {
+			return input
+		}
+		fmt.Println("This field is required. Please enter a value.")
+	}
+}
+
+// promptOptional prompts user for optional input
+func promptOptional(reader *bufio.Reader, prompt string) string {
+	fmt.Printf("%s (optional): ", prompt)
+	input, _ := reader.ReadString('\n')
+	return strings.TrimSpace(input)
+}
+
 func RootCmd() *cobra.Command {
 	return rootCmd
 }
@@ -100,6 +242,25 @@ var statusCmd = &cobra.Command{
 		}
 
 		return nil
+	},
+}
+
+// setupCmd represents the setup command
+var setupCmd = &cobra.Command{
+	Use:   "setup",
+	Short: "Interactive setup wizard",
+	Long: `Run an interactive setup wizard to configure Sonarr and Sabnzbd connections.
+
+This command will guide you through:
+- Configuring your Sonarr server connection
+- Configuring your Sabnzbd server connection
+- Testing the connections
+- Saving the configuration
+
+Examples:
+  sonarr-sabnzbd-cli setup`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return runSetupWizard()
 	},
 }
 
@@ -166,5 +327,6 @@ PowerShell:
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.AddCommand(statusCmd)
+	rootCmd.AddCommand(setupCmd)
 	rootCmd.AddCommand(completionCmd)
 }

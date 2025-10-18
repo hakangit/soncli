@@ -1,20 +1,21 @@
 # Sonarr and Sabnzbd CLI Configuration
-# This file will be created automatically in ~/.config/sonarr-sabnzbd-cli/config.yaml
+# Copy this to ~/.config/sonarr-sabnzbd-cli/config.yaml and fill in your values
 
 sonarr:
-  host: "10.84.30.100"
-  port: 8989
-  api_key: "92648e8d276948c781edd042a0991aa1"
+  host: "localhost"          # Your Sonarr server IP/hostname
+  port: 8989                 # Default Sonarr port
+  api_key: "your-api-key-here"  # Get from Sonarr Settings > General > API Key
   timeout: "30s"
 
 sabnzbd:
-  host: "10.84.30.100"
-  port: 8081
-  api_key: "6544e2177377a34d089de174ae7e14ea"
-  username: ""
-  password: ""
+  host: "localhost"          # Your Sabnzbd server IP/hostname
+  port: 8080                 # Default Sabnzbd port
+  api_key: "your-api-key-here"  # Get from Sabnzbd Config > General > API Key
+  username: ""               # Optional: only if authentication is enabled
+  password: ""               # Optional: only if authentication is enabled
   timeout: "30s"
 
+# UI preferences
 ui:
-  colors: true
-  max_results: 10
+  colors: true               # Enable colored output
+  max_results: 10            # Maximum search results to show

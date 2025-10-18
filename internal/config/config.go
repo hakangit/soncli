@@ -13,13 +13,13 @@ import (
 // LoadConfig loads the configuration from file and environment variables
 func LoadConfig() (*models.Config, error) {
 	// Set default values
-	viper.SetDefault("sonarr.host", "10.84.30.100")
+	viper.SetDefault("sonarr.host", "localhost")
 	viper.SetDefault("sonarr.port", 8989)
-	viper.SetDefault("sonarr.api_key", "92648e8d276948c781edd042a0991aa1")
+	viper.SetDefault("sonarr.api_key", "")
 	viper.SetDefault("sonarr.timeout", 30*time.Second)
-	viper.SetDefault("sabnzbd.host", "10.84.30.100")
-	viper.SetDefault("sabnzbd.port", 8081)
-	viper.SetDefault("sabnzbd.api_key", "6544e2177377a34d089de174ae7e14ea")
+	viper.SetDefault("sabnzbd.host", "localhost")
+	viper.SetDefault("sabnzbd.port", 8080)
+	viper.SetDefault("sabnzbd.api_key", "")
 	viper.SetDefault("sabnzbd.username", "")
 	viper.SetDefault("sabnzbd.password", "")
 	viper.SetDefault("sabnzbd.timeout", 30*time.Second)
@@ -100,18 +100,18 @@ func getConfigDir() (string, error) {
 
 // createDefaultConfig creates a default configuration file
 func createDefaultConfig(_ string) (*models.Config, error) {
-	// Use the provided server credentials
+	// Create config with placeholder values - user must configure
 	config := &models.Config{
 		Sonarr: models.SonarrConfig{
-			Host:    "10.84.30.100",
+			Host:    "localhost",
 			Port:    8989,
-			APIKey:  "92648e8d276948c781edd042a0991aa1",
+			APIKey:  "", // User must set this
 			Timeout: 30 * time.Second,
 		},
 		Sabnzbd: models.SabnzbdConfig{
-			Host:     "10.84.30.100",
-			Port:     8081,
-			APIKey:   "6544e2177377a34d089de174ae7e14ea",
+			Host:     "localhost",
+			Port:     8080,
+			APIKey:   "", // User must set this
 			Username: "",
 			Password: "",
 			Timeout:  30 * time.Second,
