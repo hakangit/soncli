@@ -1,4 +1,4 @@
-# Sonarr-Sabnzbd CLI
+# Soncli
 
 [![Go](https://img.shields.io/badge/Go-1.21+-blue.svg)](https://golang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -33,14 +33,14 @@ A powerful command-line interface for managing Sonarr (TV shows) and Sabnzbd (do
 1. **Clone and build:**
 ```bash
 git clone <repository-url>
-cd sonarr-sabnzbd-cli
-go build -o sonarr-sabnzbd-cli main.go
-sudo mv sonarr-sabnzbd-cli /usr/local/bin/
+cd soncli
+go build -o soncli main.go
+sudo mv soncli /usr/local/bin/
 ```
 
 2. **Run interactive setup:**
 ```bash
-sonarr-sabnzbd-cli setup
+soncli setup
 ```
 
 The setup wizard will guide you through configuring your Sonarr and Sabnzbd connections!
@@ -54,7 +54,7 @@ If you prefer manual configuration, build from source and create the config file
 #### Zsh
 ```bash
 # Generate completion script
-sonarr-sabnzbd-cli completion zsh > ~/.zsh/_sonarr-sabnzbd-cli
+soncli completion zsh > ~/.zsh/_soncli
 
 # Add to ~/.zshrc if not present
 echo "autoload -Uz compinit && compinit" >> ~/.zshrc
@@ -65,7 +65,7 @@ source ~/.zshrc
 
 #### Bash
 ```bash
-sonarr-sabnzbd-cli completion bash > /etc/bash_completion.d/sonarr-sabnzbd-cli
+soncli completion bash > /etc/bash_completion.d/soncli
 ```
 
 ## 📖 Usage
@@ -111,13 +111,13 @@ sabnzbd speed 50
 
 ```bash
 # Interactive setup wizard (first-time setup)
-sonarr-sabnzbd-cli setup
+soncli setup
 
 # Check service status
-sonarr-sabnzbd-cli status
+soncli status
 
 # Generate shell completions
-sonarr-sabnzbd-cli completion [bash|zsh|fish|powershell]
+soncli completion [bash|zsh|fish|powershell]
 ```
 
 ## ⚙️ Configuration
@@ -126,14 +126,14 @@ sonarr-sabnzbd-cli completion [bash|zsh|fish|powershell]
 
 Run the interactive setup wizard:
 ```bash
-sonarr-sabnzbd-cli setup
+soncli setup
 ```
 
 This will guide you through configuring both Sonarr and Sabnzbd connections and test them automatically.
 
 ### Manual Configuration
 
-If you prefer manual setup, create a config file at `~/.config/sonarr-sabnzbd-cli/config.yaml`:
+If you prefer manual setup, create a config file at `~/.config/soncli/config.yaml`:
 
 ```yaml
 sonarr:
@@ -184,7 +184,7 @@ go mod download
 go test ./...
 
 # Build
-go build -o sonarr-sabnzbd-cli main.go
+go build -o soncli main.go
 
 # Lint
 go vet ./...
@@ -208,4 +208,4 @@ MIT License - see LICENSE file for details.
 - [Scalarr](https://github.com/zemmyang/scalarr) - Inspiration for ASCII art
 - [Sonarr](https://sonarr.tv/) - TV show management
 - [Sabnzbd](https://sabnzbd.org/) - Binary newsreader</content>
-</xai:function_call">README.md
+</xai:function_call">README.md# soncli
