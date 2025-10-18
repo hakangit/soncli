@@ -28,8 +28,8 @@ type Queue struct {
 
 // QueueSlot represents a slot in the queue
 type QueueSlot struct {
-	ID         string `json:"id"`
-	Name       string `json:"name"`
+	ID         string `json:"nzo_id"`
+	Name       string `json:"filename"`
 	Category   string `json:"cat"`
 	Size       string `json:"size"`
 	SizeLeft   string `json:"sizeleft"`
@@ -55,7 +55,7 @@ type History struct {
 
 // HistorySlot represents a slot in the history
 type HistorySlot struct {
-	ID          string `json:"id"`
+	ID          string `json:"nzo_id"`
 	Name        string `json:"name"`
 	Category    string `json:"cat"`
 	Size        string `json:"size"`
