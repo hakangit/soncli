@@ -1,0 +1,20 @@
+# Sonarr and Sabnzbd CLI Configuration
+# This file will be created automatically in ~/.config/sonarr-sabnzbd-cli/config.yaml
+
+sonarr:
+  host: "10.84.30.100"
+  port: 8989
+  api_key: "92648e8d276948c781edd042a0991aa1"
+  timeout: "30s"
+
+sabnzbd:
+  host: "10.84.30.100"
+  port: 8081
+  api_key: "6544e2177377a34d089de174ae7e14ea"
+  username: ""
+  password: ""
+  timeout: "30s"
+
+ui:
+  colors: true
+  max_results: 10
