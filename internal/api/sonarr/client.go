@@ -14,33 +14,67 @@ import (
 
 // Client represents a Sonarr API client
 type Client struct {
-	baseURL string
-	apiKey  string
-	client  *http.Client
+	baseURL    string
+	apiKey     string
+	client     *http.Client
+	apiVersion string
 }
 
 // NewClient creates a new Sonarr API client
 func NewClient(host string, port int, apiKey string, timeout time.Duration) *Client {
-	return &Client{
+	c := &Client{
 		baseURL: fmt.Sprintf("http://%s:%d", host, port),
 		apiKey:  apiKey,
 		client: &http.Client{
 			Timeout: timeout,
 		},
+		apiVersion: "v3",
 	}
+
+	c.detectAPIVersion()
+	return c
+}
+
+func (c *Client) detectAPIVersion() {
+	req, err := http.NewRequest("GET", c.baseURL+"/api/v3/system/status", nil)
+	if err != nil {
+		c.apiVersion = ""
+		return
+	}
+
+	req.Header.Set("X-Api-Key", c.apiKey)
+	resp, err := c.client.Do(req)
+	if err != nil {
+		c.apiVersion = ""
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		c.apiVersion = "v3"
+	} else {
+		c.apiVersion = ""
+	}
+}
+
+func (c *Client) endpoint(path string) string {
+	if c.apiVersion != "" {
+		return fmt.Sprintf("/api/%s%s", c.apiVersion, path)
+	}
+	return "/api" + path
 }
 
 // GetSystemStatus retrieves the system status
 func (c *Client) GetSystemStatus() (*models.SystemStatus, error) {
 	var status models.SystemStatus
-	err := c.get("/api/system/status", &status)
+	err := c.get(c.endpoint("/system/status"), &status)
 	return &status, err
 }
 
 // GetSeries retrieves all series
 func (c *Client) GetSeries() ([]models.Series, error) {
 	var series []models.Series
-	err := c.get("/api/series", &series)
+	err := c.get(c.endpoint("/series"), &series)
 	return series, err
 }
 
@@ -49,14 +83,14 @@ func (c *Client) LookupSeries(term string) ([]models.Series, error) {
 	var series []models.Series
 	params := url.Values{}
 	params.Add("term", term)
-	err := c.get("/api/series/lookup?"+params.Encode(), &series)
+	err := c.get(c.endpoint("/series/lookup")+"?"+params.Encode(), &series)
 	return series, err
 }
 
 // GetSeriesByID retrieves a specific series by ID
 func (c *Client) GetSeriesByID(id int) (*models.Series, error) {
 	var series models.Series
-	err := c.get(fmt.Sprintf("/api/series/%d", id), &series)
+	err := c.get(c.endpoint(fmt.Sprintf("/series/%d", id)), &series)
 	return &series, err
 }
 
@@ -65,58 +99,57 @@ func (c *Client) GetEpisodes(seriesID int) ([]models.Episode, error) {
 	var episodes []models.Episode
 	params := url.Values{}
 	params.Add("seriesId", fmt.Sprintf("%d", seriesID))
-	err := c.get("/api/episode?"+params.Encode(), &episodes)
+	err := c.get(c.endpoint("/episode")+"?"+params.Encode(), &episodes)
 	return episodes, err
 }
 
 // GetQualityProfiles retrieves all quality profiles
 func (c *Client) GetQualityProfiles() ([]models.QualityProfile, error) {
 	var profiles []models.QualityProfile
-	err := c.get("/api/profile", &profiles)
+	profileEndpoint := c.endpoint("/qualityprofile")
+	err := c.get(profileEndpoint, &profiles)
+	if err != nil && c.apiVersion == "v3" {
+		err = c.get(c.endpoint("/profile"), &profiles)
+	}
 	return profiles, err
 }
 
 // GetRootFolders retrieves all root folders
 func (c *Client) GetRootFolders() ([]models.RootFolder, error) {
 	var folders []models.RootFolder
-	err := c.get("/api/rootfolder", &folders)
+	err := c.get(c.endpoint("/rootfolder"), &folders)
 	return folders, err
 }
 
 // AddSeries adds a new series
 func (c *Client) AddSeries(series models.Series, rootFolder models.RootFolder, qualityProfile models.QualityProfile) (*models.Series, error) {
-	// Prepare the series for adding
-	addSeries := struct {
-		TVDBID           int                  `json:"tvdbId"`
-		Title            string               `json:"title"`
-		QualityProfileID int                  `json:"qualityProfileId"`
-		TitleSlug        string               `json:"titleSlug"`
-		Images           []models.SeriesImage `json:"images"`
-		Seasons          []models.SeasonInfo  `json:"seasons"`
-		RootFolderPath   string               `json:"rootFolderPath"`
-		Year             int                  `json:"year"`
-		Path             string               `json:"path"`
-	}{
-		TVDBID:           series.TVDBID,
-		Title:            series.Title,
-		QualityProfileID: qualityProfile.ID,
-		TitleSlug:        series.TitleSlug,
-		Images:           series.Images,
-		Seasons:          series.Seasons,
-		RootFolderPath:   rootFolder.Path,
-		Year:             series.Year,
-		Path:             series.Path,
+	addSeries := map[string]interface{}{
+		"tvdbId":           series.TVDBID,
+		"title":            series.Title,
+		"qualityProfileId": qualityProfile.ID,
+		"titleSlug":        series.TitleSlug,
+		"rootFolderPath":   rootFolder.Path,
+		"monitored":        true,
+		"seasonFolder":     true,
+		"addOptions": map[string]interface{}{
+			"searchForMissingEpisodes": false,
+		},
+	}
+
+	if c.apiVersion == "v3" {
+		addSeries["languageProfileId"] = 1
+		addSeries["monitorNewItems"] = "all"
 	}
 
 	var result models.Series
-	err := c.post("/api/series", addSeries, &result)
+	err := c.post(c.endpoint("/series"), addSeries, &result)
 	return &result, err
 }
 
 // UpdateSeries updates an existing series
 func (c *Client) UpdateSeries(series models.Series) (*models.Series, error) {
 	var result models.Series
-	err := c.put(fmt.Sprintf("/api/series/%d", series.ID), series, &result)
+	err := c.put(c.endpoint(fmt.Sprintf("/series/%d", series.ID)), series, &result)
 	return &result, err
 }
 
@@ -126,7 +159,7 @@ func (c *Client) ImportDownloads(path string) error {
 		"name": "DownloadedEpisodesScan",
 		"path": path,
 	}
-	return c.post("/api/command", command, nil)
+	return c.post(c.endpoint("/command"), command, nil)
 }
 
 // get performs a GET request
