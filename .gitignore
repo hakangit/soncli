@@ -34,8 +34,8 @@ Thumbs.db
 # Logs
 *.log
 
-# Config files (uncomment if you want to ignore config files)
-# configs/
+# Config files with secrets
+configs/config.yaml
 
 # Cache directories
 .cache/
